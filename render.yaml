@@ -2,7 +2,7 @@ services:
   # Backend Service
   - type: web
     name: student-dashboard-backend
-    env: node
+    runtime: node
     plan: free
     rootDir: backend
     buildCommand: npm install
@@ -15,10 +15,9 @@ services:
       - key: GITHUB_TOKEN
         sync: false
 
+staticSites:
   # Frontend Static Site
-  - type: static
-    name: student-dashboard-frontend
-    env: static
+  - name: student-dashboard-frontend
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
