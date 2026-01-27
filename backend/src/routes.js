@@ -63,7 +63,7 @@ router.get("/summary", async (_, res) => {
 /* List students */
 router.get("/students", async (_, res) => {
     try {
-        const { data } = await supabase
+        const { data: students } = await supabase
             .from("students")
             .select(`
         id, name, email, created_at,
@@ -71,7 +71,45 @@ router.get("/students", async (_, res) => {
       `)
             .order('created_at', { ascending: false });
 
-        res.json(data);
+        // Fetch insights for each repository
+        if (students) {
+            for (const student of students) {
+                if (student.repositories) {
+                    for (const repo of student.repositories) {
+                        // Get total commits for this repository
+                        const { count: totalCommits } = await supabase
+                            .from("commits")
+                            .select("*", { count: "exact", head: true })
+                            .eq("repo_id", repo.id);
+
+                        // Get recent commits (last 7 days)
+                        const { count: recentCommits } = await supabase
+                            .from("commits")
+                            .select("*", { count: "exact", head: true })
+                            .eq("repo_id", repo.id)
+                            .gte("commit_date", new Date(Date.now() - 7 * 86400000).toISOString());
+
+                        // Get last commit date
+                        const { data: lastCommit } = await supabase
+                            .from("commits")
+                            .select("commit_date")
+                            .eq("repo_id", repo.id)
+                            .order("commit_date", { ascending: false })
+                            .limit(1)
+                            .single();
+
+                        // Add insights to repository object
+                        repo.insights = {
+                            total_commits: totalCommits || 0,
+                            recent_commits: recentCommits || 0,
+                            last_commit_date: lastCommit?.commit_date || null
+                        };
+                    }
+                }
+            }
+        }
+
+        res.json(students);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

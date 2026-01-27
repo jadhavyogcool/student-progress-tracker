@@ -77,6 +77,24 @@ export default function Dashboard() {
         }
     };
 
+    const formatRelativeTime = (dateString) => {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`;
+        if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) !== 1 ? 's' : ''} ago`;
+        return date.toLocaleDateString();
+    };
+
     return (
         <div className="container">
             <header>
@@ -159,9 +177,35 @@ export default function Dashboard() {
                             <h3>{student.name}</h3>
                             <p>{student.email}</p>
                             {student.repositories?.map(repo => (
-                                <a key={repo.id} href={repo.repo_url} target="_blank" className="repo-link">
-                                    🔗 {repo.owner}/{repo.repo_name}
-                                </a>
+                                <div key={repo.id} className="repo-section">
+                                    <a href={repo.repo_url} target="_blank" className="repo-link">
+                                        🔗 {repo.owner}/{repo.repo_name}
+                                    </a>
+                                    {repo.insights && (
+                                        <div className="repo-insights">
+                                            <div className="insight-item">
+                                                <span className="insight-icon">📊</span>
+                                                <span className="insight-text">
+                                                    {repo.insights.total_commits} commit{repo.insights.total_commits !== 1 ? 's' : ''}
+                                                </span>
+                                            </div>
+                                            <div className="insight-item">
+                                                <span className="insight-icon">📈</span>
+                                                <span className="insight-text">
+                                                    {repo.insights.recent_commits} recent (7 days)
+                                                </span>
+                                            </div>
+                                            {repo.insights.last_commit_date && (
+                                                <div className="insight-item">
+                                                    <span className="insight-icon">🕒</span>
+                                                    <span className="insight-text">
+                                                        Last: {formatRelativeTime(repo.insights.last_commit_date)}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                         <div className="actions">
