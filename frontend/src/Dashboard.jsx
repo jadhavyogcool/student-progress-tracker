@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import StatsCard from "./components/StatsCard";
 
 export default function Dashboard() {
+    // Render provides 'host' in VITE_API_URL via fromService, so we might need to prepend https:// if it's missing protocol
+    // However, usually we can just set VITE_API_URL to the full URL in .env or Render dashboard manually for simplicity
+    // But to be robust with the render.yaml fromService config which returns 'host':
+    const getApiUrl = () => {
+        const url = import.meta.env.VITE_API_URL;
+        if (!url) return "http://localhost:3000";
+        if (url.startsWith("http")) return url;
+        return `https://${url}`;
+    };
+    const API_BASE = getApiUrl();
+
     const [summary, setSummary] = useState({ students: 0, repositories: 0, commits: 0, active: 0 });
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -10,8 +21,8 @@ export default function Dashboard() {
     const fetchData = async () => {
         try {
             const [summaryRes, studentsRes] = await Promise.all([
-                fetch("http://localhost:3000/api/summary"),
-                fetch("http://localhost:3000/api/students")
+                fetch(`${API_BASE}/api/summary`),
+                fetch(`${API_BASE}/api/students`)
             ]);
             const summaryData = await summaryRes.json();
             const studentsData = await studentsRes.json();
@@ -32,7 +43,7 @@ export default function Dashboard() {
     const handleAddStudent = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch("http://localhost:3000/api/student", {
+            const res = await fetch(`${API_BASE}/api/student`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newStudent)
@@ -49,7 +60,7 @@ export default function Dashboard() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure?")) return;
         try {
-            await fetch(`http://localhost:3000/api/student/${id}`, { method: "DELETE" });
+            await fetch(`${API_BASE}/api/student/${id}`, { method: "DELETE" });
             fetchData();
         } catch (err) {
             console.error(err);
@@ -58,7 +69,7 @@ export default function Dashboard() {
 
     const handleSync = async (repoId) => {
         try {
-            await fetch(`http://localhost:3000/api/sync/${repoId}`, { method: "POST" });
+            await fetch(`${API_BASE}/api/sync/${repoId}`, { method: "POST" });
             fetchData();
             alert("Synced successfully!");
         } catch (err) {
