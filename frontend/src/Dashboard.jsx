@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StatsCard from "./components/StatsCard";
+import BulkUpload from "./components/BulkUpload";
 
 export default function Dashboard() {
     // Render provides 'host' in VITE_API_URL via fromService, so we might need to prepend https:// if it's missing protocol
@@ -12,11 +14,25 @@ export default function Dashboard() {
         return `https://${url}`;
     };
     const API_BASE = getApiUrl();
+    const navigate = useNavigate();
 
     const [summary, setSummary] = useState({ students: 0, repositories: 0, commits: 0, active: 0 });
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newStudent, setNewStudent] = useState({ name: "", email: "", repoUrl: "" });
+
+    const handleLogout = async () => {
+        try {
+            await fetch(`${API_BASE}/api/auth/logout`, {
+                method: "POST",
+                credentials: "include"
+            });
+            navigate("/");
+        } catch (err) {
+            console.error("Logout failed", err);
+        }
+    };
+
 
     const fetchData = async () => {
         try {
@@ -97,12 +113,17 @@ export default function Dashboard() {
 
     return (
         <div className="container">
-            <header>
-                <h1>
-                    <span style={{ fontSize: "2rem" }}>🎓</span>
-                    Student Project Dashboard
-                </h1>
-                <p>Track student GitHub repositories and commit progress</p>
+            <header className="dashboard-header">
+                <div>
+                    <h1>
+                        <span style={{ fontSize: "2rem" }}>🎓</span>
+                        Student Project Dashboard
+                    </h1>
+                    <p>Track student GitHub repositories and commit progress</p>
+                </div>
+                <button onClick={handleLogout} className="btn-logout">
+                    🚪 Logout
+                </button>
             </header>
 
             <div className="stats-grid">
@@ -169,6 +190,8 @@ export default function Dashboard() {
                     <button type="submit" className="btn-primary">+ Add Student</button>
                 </form>
             </div>
+
+            <BulkUpload onUploadComplete={fetchData} API_BASE={API_BASE} />
 
             <div className="student-list">
                 {students.map(student => (

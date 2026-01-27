@@ -1,11 +1,58 @@
 import express from "express";
+import multer from "multer";
+import csv from "csv-parser";
+import { Readable } from "stream";
 import { supabase } from "./supabase.js";
 import { fetchCommits } from "./github.js";
+import { requireAuth } from "./middleware/auth.js";
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
+/* ========== AUTHENTICATION ROUTES ========== */
+
+// Login
+router.post("/auth/login", (req, res) => {
+    const { password } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+    if (password === adminPassword) {
+        req.session.isAuthenticated = true;
+        req.session.save((err) => {
+            if (err) {
+                return res.status(500).json({ error: "Session error" });
+            }
+            res.json({ success: true, message: "Logged in successfully" });
+        });
+    } else {
+        res.status(401).json({ error: "Invalid password" });
+    }
+});
+
+// Logout
+router.post("/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ error: "Logout failed" });
+        }
+        res.json({ success: true, message: "Logged out successfully" });
+    });
+});
+
+// Verify authentication
+router.get("/auth/verify", (req, res) => {
+    if (req.session && req.session.isAuthenticated) {
+        res.json({ authenticated: true });
+    } else {
+        res.json({ authenticated: false });
+    }
+});
+
+/* ========== STUDENT ROUTES ========== */
+
 
 /* Add student + repo */
-router.post("/student", async (req, res) => {
+router.post("/student", requireAuth, async (req, res) => {
     try {
         const { name, email, repoUrl } = req.body;
         const parts = repoUrl.split("/");
@@ -116,7 +163,7 @@ router.get("/students", async (_, res) => {
 });
 
 /* Delete Student */
-router.delete("/student/:id", async (req, res) => {
+router.delete("/student/:id", requireAuth, async (req, res) => {
     try {
         const { error } = await supabase.from("students").delete().eq("id", req.params.id);
         if (error) throw error;
@@ -153,6 +200,112 @@ router.post("/sync/:repoId", async (req, res) => {
         res.json({ synced: true, count: commits.length });
     } catch (error) {
         console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/* Bulk upload students via CSV */
+router.post("/students/bulk", requireAuth, upload.single("file"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const results = [];
+        const errors = [];
+        const csvData = [];
+
+        // Parse CSV from buffer
+        const stream = Readable.from(req.file.buffer.toString());
+
+        stream
+            .pipe(csv())
+            .on("data", (row) => {
+                csvData.push(row);
+            })
+            .on("end", async () => {
+                // Process each row
+                for (let i = 0; i < csvData.length; i++) {
+                    const row = csvData[i];
+                    const rowNumber = i + 2; // +2 because row 1 is header and array is 0-indexed
+
+                    try {
+                        const { name, email, repo_url } = row;
+
+                        // Validate required fields
+                        if (!name || !repo_url) {
+                            errors.push({
+                                row: rowNumber,
+                                data: row,
+                                error: "Missing required fields (name, repo_url)"
+                            });
+                            continue;
+                        }
+
+                        // Parse GitHub URL
+                        const parts = repo_url.trim().split("/");
+                        const owner = parts[parts.length - 2];
+                        const repo_name = parts[parts.length - 1];
+
+                        if (!owner || !repo_name) {
+                            errors.push({
+                                row: rowNumber,
+                                data: row,
+                                error: "Invalid GitHub URL format"
+                            });
+                            continue;
+                        }
+
+                        // Insert student
+                        const { data: student, error: studentError } = await supabase
+                            .from("students")
+                            .insert({ name: name.trim(), email: email?.trim() || null })
+                            .select()
+                            .single();
+
+                        if (studentError) throw studentError;
+
+                        // Insert repository
+                        const { error: repoError } = await supabase
+                            .from("repositories")
+                            .insert({
+                                student_id: student.id,
+                                repo_url: repo_url.trim(),
+                                owner,
+                                repo_name
+                            });
+
+                        if (repoError) throw repoError;
+
+                        results.push({
+                            row: rowNumber,
+                            student: student.name,
+                            success: true
+                        });
+
+                    } catch (error) {
+                        errors.push({
+                            row: rowNumber,
+                            data: row,
+                            error: error.message
+                        });
+                    }
+                }
+
+                // Send response
+                res.json({
+                    success: true,
+                    imported: results.length,
+                    failed: errors.length,
+                    results,
+                    errors
+                });
+            })
+            .on("error", (error) => {
+                res.status(500).json({ error: "CSV parsing failed: " + error.message });
+            });
+
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });

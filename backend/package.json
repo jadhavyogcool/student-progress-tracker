@@ -8,10 +8,13 @@
         "dev": "node --watch src/server.js"
     },
     "dependencies": {
-        "express": "^4.19.2",
-        "cors": "^2.8.5",
-        "dotenv": "^16.4.5",
         "@supabase/supabase-js": "^2.43.4",
-        "axios": "^1.7.2"
+        "axios": "^1.7.2",
+        "cors": "^2.8.5",
+        "csv-parser": "^3.2.0",
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "express-session": "^1.19.0",
+        "multer": "^2.0.2"
     }
 }

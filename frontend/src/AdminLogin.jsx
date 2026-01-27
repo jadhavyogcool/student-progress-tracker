@@ -1,0 +1,72 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function AdminLogin({ onLogin }) {
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const API_BASE = import.meta.env.VITE_API_URL?.startsWith("http")
+        ? import.meta.env.VITE_API_URL
+        : import.meta.env.VITE_API_URL
+            ? `https://${import.meta.env.VITE_API_URL}`
+            : "http://localhost:3000";
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        try {
+            const res = await fetch(`${API_BASE}/api/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                onLogin();
+                navigate("/dashboard");
+            } else {
+                setError(data.error || "Login failed");
+            }
+        } catch (err) {
+            setError("Connection error. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="login-container">
+            <div className="login-card">
+                <div className="login-header">
+                    <h1>🎓 Admin Login</h1>
+                    <p>Student Progress Tracker</p>
+                </div>
+                <form onSubmit={handleSubmit} className="login-form">
+                    <div className="input-group">
+                        <label>Admin Password</label>
+                        <input
+                            type="password"
+                            className="form-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter admin password"
+                            required
+                            autoFocus
+                        />
+                    </div>
+                    {error && <div className="error-message">{error}</div>}
+                    <button type="submit" className="btn-primary" disabled={loading}>
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
