@@ -32,6 +32,14 @@ function App() {
         checkAuth();
     }, []);
 
+    const handleLogin = () => {
+        setIsAuthenticated(true);
+    };
+
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+    };
+
     if (loading) {
         return <div className="loading-screen">Loading...</div>;
     }
@@ -39,23 +47,19 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
+                {/* Public dashboard route */}
                 <Route
                     path="/"
-                    element={
-                        isAuthenticated ? (
-                            <Navigate to="/dashboard" replace />
-                        ) : (
-                            <AdminLogin onLogin={() => setIsAuthenticated(true)} />
-                        )
-                    }
+                    element={<Dashboard isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
                 />
+                {/* Admin login route */}
                 <Route
-                    path="/dashboard"
+                    path="/admin"
                     element={
                         isAuthenticated ? (
-                            <Dashboard />
-                        ) : (
                             <Navigate to="/" replace />
+                        ) : (
+                            <AdminLogin onLogin={handleLogin} />
                         )
                     }
                 />

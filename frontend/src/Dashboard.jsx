@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import StatsCard from "./components/StatsCard";
 import BulkUpload from "./components/BulkUpload";
 
-export default function Dashboard() {
+export default function Dashboard({ isAuthenticated, onLogout }) {
     // Render provides 'host' in VITE_API_URL via fromService, so we might need to prepend https:// if it's missing protocol
     // However, usually we can just set VITE_API_URL to the full URL in .env or Render dashboard manually for simplicity
     // But to be robust with the render.yaml fromService config which returns 'host':
@@ -27,7 +27,7 @@ export default function Dashboard() {
                 method: "POST",
                 credentials: "include"
             });
-            navigate("/");
+            onLogout();
         } catch (err) {
             console.error("Logout failed", err);
         }
@@ -62,11 +62,14 @@ export default function Dashboard() {
             const res = await fetch(`${API_BASE}/api/student`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(newStudent)
             });
             if (res.ok) {
                 setNewStudent({ name: "", email: "", repoUrl: "" });
                 fetchData();
+            } else {
+                alert("Failed to add student. Please login as admin.");
             }
         } catch (err) {
             console.error(err);
@@ -76,8 +79,15 @@ export default function Dashboard() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure?")) return;
         try {
-            await fetch(`${API_BASE}/api/student/${id}`, { method: "DELETE" });
-            fetchData();
+            const res = await fetch(`${API_BASE}/api/student/${id}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            if (res.ok) {
+                fetchData();
+            } else {
+                alert("Failed to delete student. Please login as admin.");
+            }
         } catch (err) {
             console.error(err);
         }
@@ -121,9 +131,15 @@ export default function Dashboard() {
                     </h1>
                     <p>Track student GitHub repositories and commit progress</p>
                 </div>
-                <button onClick={handleLogout} className="btn-logout">
-                    🚪 Logout
-                </button>
+                {isAuthenticated ? (
+                    <button onClick={handleLogout} className="btn-logout">
+                        🚪 Logout
+                    </button>
+                ) : (
+                    <button onClick={() => navigate("/admin")} className="btn-primary">
+                        🔐 Admin Login
+                    </button>
+                )}
             </header>
 
             <div className="stats-grid">
@@ -154,44 +170,48 @@ export default function Dashboard() {
                 />
             </div>
 
-            <div className="card form-section">
-                <h2 className="form-title">Add Student Project</h2>
-                <form onSubmit={handleAddStudent}>
-                    <div className="input-group">
-                        <label>Student Name *</label>
-                        <input
-                            className="form-input"
-                            required
-                            value={newStudent.name}
-                            onChange={e => setNewStudent({ ...newStudent, name: e.target.value })}
-                            placeholder="John Doe"
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label>Email</label>
-                        <input
-                            className="form-input"
-                            type="email"
-                            value={newStudent.email}
-                            onChange={e => setNewStudent({ ...newStudent, email: e.target.value })}
-                            placeholder="john@example.com"
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label>GitHub Repository URL *</label>
-                        <input
-                            className="form-input"
-                            required
-                            value={newStudent.repoUrl}
-                            onChange={e => setNewStudent({ ...newStudent, repoUrl: e.target.value })}
-                            placeholder="https://github.com/username/repo"
-                        />
-                    </div>
-                    <button type="submit" className="btn-primary">+ Add Student</button>
-                </form>
-            </div>
+            {/* Admin-only: Add Student Form */}
+            {isAuthenticated && (
+                <div className="card form-section">
+                    <h2 className="form-title">Add Student Project</h2>
+                    <form onSubmit={handleAddStudent}>
+                        <div className="input-group">
+                            <label>Student Name *</label>
+                            <input
+                                className="form-input"
+                                required
+                                value={newStudent.name}
+                                onChange={e => setNewStudent({ ...newStudent, name: e.target.value })}
+                                placeholder="John Doe"
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label>Email</label>
+                            <input
+                                className="form-input"
+                                type="email"
+                                value={newStudent.email}
+                                onChange={e => setNewStudent({ ...newStudent, email: e.target.value })}
+                                placeholder="john@example.com"
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label>GitHub Repository URL *</label>
+                            <input
+                                className="form-input"
+                                required
+                                value={newStudent.repoUrl}
+                                onChange={e => setNewStudent({ ...newStudent, repoUrl: e.target.value })}
+                                placeholder="https://github.com/username/repo"
+                            />
+                        </div>
+                        <button type="submit" className="btn-primary">+ Add Student</button>
+                    </form>
+                </div>
+            )}
 
-            <BulkUpload onUploadComplete={fetchData} API_BASE={API_BASE} />
+            {/* Admin-only: Bulk Upload */}
+            {isAuthenticated && <BulkUpload onUploadComplete={fetchData} API_BASE={API_BASE} />}
 
             <div className="student-list">
                 {students.map(student => (
@@ -237,9 +257,12 @@ export default function Dashboard() {
                                     🔄
                                 </button>
                             ))}
-                            <button onClick={() => handleDelete(student.id)} className="btn-icon" title="Delete Student">
-                                🗑️
-                            </button>
+                            {/* Admin-only: Delete button */}
+                            {isAuthenticated && (
+                                <button onClick={() => handleDelete(student.id)} className="btn-icon" title="Delete Student">
+                                    🗑️
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

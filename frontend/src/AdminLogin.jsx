@@ -30,7 +30,7 @@ export default function AdminLogin({ onLogin }) {
 
             if (res.ok) {
                 onLogin();
-                navigate("/dashboard");
+                navigate("/");
             } else {
                 setError(data.error || "Login failed");
             }
