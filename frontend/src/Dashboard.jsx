@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StatsCard from "./components/StatsCard";
 import BulkUpload from "./components/BulkUpload";
+import CommitChart from "./components/CommitChart";
 
 export default function Dashboard({ isAuthenticated, onLogout }) {
     // Render provides 'host' in VITE_API_URL via fromService, so we might need to prepend https:// if it's missing protocol
@@ -20,6 +21,8 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newStudent, setNewStudent] = useState({ name: "", email: "", repoUrl: "" });
+    const [expandedRepo, setExpandedRepo] = useState(null);
+    const [contributorData, setContributorData] = useState({});
 
     const handleLogout = async () => {
         try {
@@ -49,6 +52,26 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
             console.error("Failed to fetch data", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchContributorData = async (repoId) => {
+        if (contributorData[repoId]) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/repository/${repoId}/contributors`);
+            const data = await res.json();
+            setContributorData(prev => ({ ...prev, [repoId]: data }));
+        } catch (err) {
+            console.error("Failed to fetch contributor data", err);
+        }
+    };
+
+    const toggleRepo = (repoId) => {
+        if (expandedRepo === repoId) {
+            setExpandedRepo(null);
+        } else {
+            setExpandedRepo(repoId);
+            fetchContributorData(repoId);
         }
     };
 
@@ -242,6 +265,35 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                                                     </span>
                                                 </div>
                                             )}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={() => toggleRepo(repo.id)}
+                                        className="btn-text"
+                                        style={{ marginTop: '10px', fontSize: '0.85rem' }}
+                                    >
+                                        {expandedRepo === repo.id ? '🔼 Hide Details' : '🔽 View Contributor Details'}
+                                    </button>
+
+                                    {expandedRepo === repo.id && contributorData[repo.id] && (
+                                        <div className="contributor-details animate-fade-in">
+                                            <div className="contributor-list">
+                                                <h4>Contributors</h4>
+                                                <div className="contributor-grid">
+                                                    {contributorData[repo.id].contributors.map(c => (
+                                                        <div key={c.author} className="contributor-stat-card">
+                                                            <div className="contributor-name">{c.author}</div>
+                                                            <div className="contributor-commits">{c.commit_count} commits</div>
+                                                            <div className="contributor-percentage">{c.percentage}%</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <CommitChart
+                                                timeline={contributorData[repo.id].timeline}
+                                                contributors={contributorData[repo.id].contributors}
+                                            />
                                         </div>
                                     )}
                                 </div>

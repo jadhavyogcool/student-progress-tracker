@@ -204,6 +204,83 @@ router.post("/sync/:repoId", async (req, res) => {
     }
 });
 
+/* Get repository contributor statistics */
+router.get("/repository/:repoId/contributors", async (req, res) => {
+    try {
+        const { repoId } = req.params;
+
+        // Get all commits for this repository
+        const { data: commits, error } = await supabase
+            .from("commits")
+            .select("author, commit_date")
+            .eq("repo_id", repoId)
+            .order("commit_date", { ascending: true });
+
+        if (error) throw error;
+
+        if (!commits || commits.length === 0) {
+            return res.json({
+                total_commits: 0,
+                contributors: [],
+                timeline: []
+            });
+        }
+
+        // Group commits by author
+        const contributorMap = {};
+        commits.forEach(commit => {
+            const author = commit.author || "Unknown";
+            if (!contributorMap[author]) {
+                contributorMap[author] = {
+                    author,
+                    commit_count: 0,
+                    first_commit: commit.commit_date,
+                    last_commit: commit.commit_date
+                };
+            }
+            contributorMap[author].commit_count++;
+            contributorMap[author].last_commit = commit.commit_date;
+        });
+
+        // Calculate percentages
+        const totalCommits = commits.length;
+        const contributors = Object.values(contributorMap).map(contributor => ({
+            ...contributor,
+            percentage: ((contributor.commit_count / totalCommits) * 100).toFixed(1)
+        })).sort((a, b) => b.commit_count - a.commit_count);
+
+        // Create timeline data (group by date)
+        const timelineMap = {};
+        commits.forEach(commit => {
+            const date = commit.commit_date.split('T')[0]; // Get date part only
+            const author = commit.author || "Unknown";
+
+            if (!timelineMap[date]) {
+                timelineMap[date] = {};
+            }
+            if (!timelineMap[date][author]) {
+                timelineMap[date][author] = 0;
+            }
+            timelineMap[date][author]++;
+        });
+
+        // Convert timeline map to array
+        const timeline = Object.entries(timelineMap).map(([date, commits_by_author]) => ({
+            date,
+            commits_by_author
+        })).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        res.json({
+            total_commits: totalCommits,
+            contributors,
+            timeline
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 /* Bulk upload students via CSV */
 router.post("/students/bulk", requireAuth, upload.single("file"), async (req, res) => {
     try {
