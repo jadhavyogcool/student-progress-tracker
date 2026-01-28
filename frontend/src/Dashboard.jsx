@@ -131,13 +131,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                     </h1>
                     <p>Track student GitHub repositories and commit progress</p>
                 </div>
-                {isAuthenticated ? (
+                {isAuthenticated && (
                     <button onClick={handleLogout} className="btn-logout">
                         🚪 Logout
-                    </button>
-                ) : (
-                    <button onClick={() => navigate("/admin")} className="btn-primary">
-                        🔐 Admin Login
                     </button>
                 )}
             </header>
