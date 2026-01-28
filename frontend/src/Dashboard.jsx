@@ -23,6 +23,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
     const [newStudent, setNewStudent] = useState({ name: "", email: "", repoUrl: "" });
     const [expandedRepo, setExpandedRepo] = useState(null);
     const [contributorData, setContributorData] = useState({});
+    const [leaderboard, setLeaderboard] = useState([]);
 
     const handleLogout = async () => {
         try {
@@ -39,15 +40,18 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
 
     const fetchData = async () => {
         try {
-            const [summaryRes, studentsRes] = await Promise.all([
+            const [summaryRes, studentsRes, leaderboardRes] = await Promise.all([
                 fetch(`${API_BASE}/api/summary`),
-                fetch(`${API_BASE}/api/students`)
+                fetch(`${API_BASE}/api/students`),
+                fetch(`${API_BASE}/api/leaderboard`)
             ]);
             const summaryData = await summaryRes.json();
             const studentsData = await studentsRes.json();
+            const leaderboardData = await leaderboardRes.json();
 
             setSummary(summaryData);
             setStudents(studentsData);
+            setLeaderboard(leaderboardData);
         } catch (err) {
             console.error("Failed to fetch data", err);
         } finally {
@@ -187,6 +191,27 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                     icon="📈"
                     colorClass="icon-orange"
                 />
+            </div>
+
+            {/* Leaderboard Section */}
+            <div className="card leaderboard-section">
+                <h2 className="section-title">🏆 Project Leaderboard</h2>
+                <div className="leaderboard-list">
+                    {leaderboard.map((item, index) => (
+                        <div key={item.id} className="leaderboard-item">
+                            <div className="rank">
+                                {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}
+                            </div>
+                            <div className="repo-details">
+                                <div className="repo-name">{item.name}</div>
+                                <div className="student-name">{item.student_name}</div>
+                            </div>
+                            <div className="commit-badge">
+                                ⚡ {item.commit_count} commits
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Admin-only: Add Student Form */}

@@ -387,4 +387,41 @@ router.post("/students/bulk", requireAuth, upload.single("file"), async (req, re
     }
 });
 
+/* Get repository leaderboard */
+router.get("/leaderboard", async (_, res) => {
+    try {
+        const { data: repos, error } = await supabase
+            .from("repositories")
+            .select(`
+                id, repo_name, owner,
+                students ( name )
+            `);
+
+        if (error) throw error;
+
+        // Fetch commit counts for each repo
+        const leaderboard = await Promise.all(repos.map(async (repo) => {
+            const { count } = await supabase
+                .from("commits")
+                .select("*", { count: "exact", head: true })
+                .eq("repo_id", repo.id);
+
+            return {
+                id: repo.id,
+                name: repo.repo_name,
+                owner: repo.owner,
+                student_name: repo.students?.name || "Unknown",
+                commit_count: count || 0
+            };
+        }));
+
+        // Sort by commit count descending
+        leaderboard.sort((a, b) => b.commit_count - a.commit_count);
+
+        res.json(leaderboard);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;
