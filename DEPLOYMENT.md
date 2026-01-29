@@ -17,11 +17,19 @@ Render will detect the `render.yaml` file and ask you to fill in the following v
 | Variable | Description |
 | :--- | :--- |
 | `SUPABASE_URL` | Your Supabase Project URL. |
-| `SUPABASE_KEY` | Your Supabase Service Role key (or anon key if appropriate). |
+| `SUPABASE_KEY` | Your Supabase Service Role key. |
 | `GITHUB_TOKEN` | Your GitHub Personal Access Token. |
-| `ADMIN_PASSWORD` | The password you want to use for the admin login. |
-| `SESSION_SECRET` | A long, random string for session security. |
-| `FRONTEND_URL` | The URL of your frontend service (once created, e.g., `https://your-frontend.onrender.com`). |
+| `ADMIN_PASSWORD` | The password for the admin login. |
+| `SESSION_SECRET` | A random string for session security. |
+| `FRONTEND_URL` | **(Backend Setting)** The public URL of your frontend (e.g., `https://student-dashboard-frontend.onrender.com`). |
+| `VITE_API_URL` | **(Frontend Setting)** The public URL of your backend (e.g., `https://student-dashboard-backend.onrender.com`). |
+
+> [!IMPORTANT]
+> Since Render provides random URLs, you might need to:
+> 1. Deploy the services first with placeholders.
+> 2. Copy the actual URLs Render gives you for each service.
+> 3. Go to **Dashboard > Service > Settings > Env Vars** and update them.
+> 4. Trigger a "Clear Cache and Redeploy".
 
 ## Step 3: Deployment
 1. Click **Apply**.

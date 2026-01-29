@@ -37,7 +37,4 @@ services:
     startCommand: npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: student-dashboard-backend
-          property: host
+        sync: false
