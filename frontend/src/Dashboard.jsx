@@ -156,8 +156,18 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
         return date.toLocaleDateString();
     };
 
+    if (loading) {
+        return (
+            <div className="loading-backdrop">
+                <div className="spinner"></div>
+                <p>Establishing connection with server...</p>
+                <small>This may take up to 30 seconds on Render initial boot</small>
+            </div>
+        );
+    }
+
     return (
-        <div className="container">
+        <div className="container animate-fade-in">
             <header className="dashboard-header">
                 <div>
                     <h1>
