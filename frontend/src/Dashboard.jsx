@@ -81,6 +81,14 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
 
     useEffect(() => {
         fetchData();
+
+        // Auto-refresh every 15 minutes
+        const interval = setInterval(() => {
+            console.log("Auto-refreshing dashboard data...");
+            fetchData();
+        }, 15 * 60 * 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleAddStudent = async (e) => {

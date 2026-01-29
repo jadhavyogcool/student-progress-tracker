@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import session from "express-session";
 import routes from "./routes.js";
+import { initScheduler } from "./scheduler.js";
 
 dotenv.config();
 
@@ -42,4 +43,5 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Backend running on port ${PORT}`);
+    initScheduler();
 });

@@ -16,6 +16,7 @@ create table repositories (
   repo_url text not null,
   owner text not null,
   repo_name text not null,
+  synced_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
