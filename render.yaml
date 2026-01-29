@@ -14,6 +14,14 @@ services:
         sync: false
       - key: GITHUB_TOKEN
         sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
 
   # Frontend Web Service (Node.js serving static files)
   - type: web
