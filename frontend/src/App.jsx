@@ -40,9 +40,7 @@ function App() {
         setIsAuthenticated(false);
     };
 
-    if (loading) {
-        return <div className="loading-screen">Loading...</div>;
-    }
+    // Initial auth check loading removed
 
     return (
         <BrowserRouter>
