@@ -206,7 +206,10 @@ router.post("/sync/:repoId", async (req, res) => {
 });
 
 /* Sync all repositories (for Vercel Cron) */
-router.get("/sync/all", async (req, res) => {
+router.get("/sync/all", syncHandler);
+router.get("/cron", syncHandler);
+
+async function syncHandler(req, res) {
     // Optional: Verify Vercel Cron Secret
     const authHeader = req.headers.authorization;
     if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -220,7 +223,7 @@ router.get("/sync/all", async (req, res) => {
         console.error("Cron sync failed:", error);
         res.status(500).json({ error: error.message });
     }
-});
+}
 
 /* Get repository contributor statistics */
 router.get("/repository/:repoId/contributors", async (req, res) => {
