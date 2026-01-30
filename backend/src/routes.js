@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import { supabase } from "./supabase.js";
 import { fetchCommits } from "./github.js";
 import { requireAuth } from "./middleware/auth.js";
+import { syncAllRepositories } from "./scheduler.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -200,6 +201,23 @@ router.post("/sync/:repoId", async (req, res) => {
         res.json({ synced: true, count: commits.length });
     } catch (error) {
         console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/* Sync all repositories (for Vercel Cron) */
+router.get("/sync/all", async (req, res) => {
+    // Optional: Verify Vercel Cron Secret
+    const authHeader = req.headers.authorization;
+    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+        await syncAllRepositories();
+        res.json({ success: true, message: "All repositories synced" });
+    } catch (error) {
+        console.error("Cron sync failed:", error);
         res.status(500).json({ error: error.message });
     }
 });
