@@ -156,14 +156,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
         return date.toLocaleDateString();
     };
 
-    if (loading) {
-        return (
-            <div className="loading-backdrop">
-                <div className="spinner"></div>
-                <p>Establishing connection with server...</p>
-            </div>
-        );
-    }
+    // Removed loading screen as per request
 
     return (
         <div className="container animate-fade-in">
