@@ -43,5 +43,6 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Backend running on port ${PORT}`);
+    // Sync logic updated for Vercel Cron compatibility
     initScheduler();
 });
