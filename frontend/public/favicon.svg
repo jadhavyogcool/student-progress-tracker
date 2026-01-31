@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a"/>
+      <stop offset="100%" style="stop-color:#1f1f1f"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  
+  <!-- Outer decorative ring -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#2a2a2a" stroke-width="12"/>
+  
+  <!-- Progress arc (75% complete) -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#ffffff" stroke-width="12" 
+          stroke-dasharray="942 1256" stroke-linecap="round" 
+          transform="rotate(-90 256 256)"/>
+  
+  <!-- Inner circle background -->
+  <circle cx="256" cy="256" r="160" fill="#111"/>
+  
+  <!-- Letter S - elegant serif style -->
+  <text x="256" y="310" 
+        font-family="Georgia, Times New Roman, serif" 
+        font-size="220" 
+        font-weight="700" 
+        fill="#ffffff" 
+        text-anchor="middle"
+        font-style="italic">S</text>
+  
+  <!-- Small accent dots -->
+  <circle cx="120" cy="120" r="12" fill="#333"/>
+  <circle cx="392" cy="392" r="12" fill="#fff"/>
+</svg>
