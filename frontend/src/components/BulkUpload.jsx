@@ -23,7 +23,7 @@ export default function BulkUpload({ onUploadComplete, API_BASE }) {
             const formData = new FormData();
             formData.append("file", file);
 
-            const res = await fetch(`${API_BASE}/api/students/bulk`, {
+            const res = await fetch(`${API_BASE}/api/upload-csv`, {
                 method: "POST",
                 credentials: "include",
                 body: formData
@@ -48,57 +48,61 @@ export default function BulkUpload({ onUploadComplete, API_BASE }) {
     };
 
     return (
-        <div className="card bulk-upload-section">
-            <h2 className="form-title">📤 Bulk Upload Students (CSV)</h2>
-            <p className="upload-description">
-                Upload a CSV file with columns: <code>name</code>, <code>email</code>, <code>repo_url</code>
-            </p>
+        <div className="card">
+            <div className="card-header">
+                <div className="card-title">Bulk Upload</div>
+            </div>
+            <div className="card-body">
+                <p className="upload-description">
+                    CSV with: <code>name</code>, <code>email</code>, <code>repoUrl</code>
+                </p>
 
-            <div className="file-upload-container">
-                <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileChange}
-                    className="file-input"
-                    id="csv-file"
-                />
-                <label htmlFor="csv-file" className="file-label">
-                    {file ? `📄 ${file.name}` : "Choose CSV File"}
-                </label>
+                <div className="file-upload-container">
+                    <input
+                        type="file"
+                        accept=".csv"
+                        onChange={handleFileChange}
+                        className="file-input"
+                        id="csv-file"
+                    />
+                    <label htmlFor="csv-file" className="file-label">
+                        {file ? file.name : "Choose CSV File"}
+                    </label>
+                </div>
+                
                 <button
                     onClick={handleUpload}
                     disabled={!file || uploading}
                     className="btn-primary"
-                    style={{ marginLeft: "1rem" }}
+                    style={{ marginTop: "1rem" }}
                 >
-                    {uploading ? "Uploading..." : "Upload"}
+                    {uploading ? "Uploading..." : "Upload Students"}
                 </button>
-            </div>
 
-            {result && (
-                <div className={`upload-result ${result.error ? "error" : "success"}`}>
-                    {result.error ? (
-                        <p>❌ {result.error}</p>
-                    ) : (
-                        <>
-                            <p>✅ Upload Complete!</p>
-                            <p>Imported: {result.imported} | Failed: {result.failed}</p>
-                            {result.errors && result.errors.length > 0 && (
-                                <details className="error-details">
-                                    <summary>View Errors ({result.errors.length})</summary>
-                                    <ul>
-                                        {result.errors.map((err, idx) => (
-                                            <li key={idx}>
-                                                Row {err.row}: {err.error}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </details>
-                            )}
-                        </>
-                    )}
-                </div>
-            )}
+                {result && (
+                    <div className={`upload-result ${result.error ? "error" : "success"}`}>
+                        {result.error ? (
+                            <p>Error: {result.error}</p>
+                        ) : (
+                            <>
+                                <p>Success: Imported {result.imported} students</p>
+                                {result.errors && result.errors.length > 0 && (
+                                    <details className="error-details">
+                                        <summary>View Errors ({result.errors.length})</summary>
+                                        <ul>
+                                            {result.errors.map((err, idx) => (
+                                                <li key={idx}>
+                                                    Row {err.row}: {err.error}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </details>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

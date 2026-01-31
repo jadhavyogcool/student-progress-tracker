@@ -42,12 +42,14 @@ export default function AdminLogin({ onLogin }) {
     };
 
     return (
-        <div className="login-container">
-            <div className="login-card">
-                <div className="login-header">
-                    <h1>🎓 Admin Login</h1>
-                    <p>Student Progress Tracker</p>
-                </div>
+        <div className="login-page">
+            <div className="login-container">
+                <div className="login-card">
+                    <div className="login-header">
+                        <div className="login-logo">S</div>
+                        <h1 className="login-title">Admin Access</h1>
+                        <p className="login-subtitle">Scholar Progress Tracker</p>
+                    </div>
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="input-group">
                         <label>Admin Password</label>
@@ -61,12 +63,16 @@ export default function AdminLogin({ onLogin }) {
                             autoFocus
                         />
                     </div>
-                    {error && <div className="error-message">{error}</div>}
+                    {error && <div className="login-error">{error}</div>}
                     <button type="submit" className="btn-primary" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
+                        {loading ? "Authenticating..." : "Sign In"}
                     </button>
+                    <div className="login-footer">
+                        <p>Default password: admin123</p>
+                    </div>
                 </form>
             </div>
+        </div>
         </div>
     );
 }

@@ -5,7 +5,10 @@
     "type": "module",
     "scripts": {
         "start": "node src/server.js",
-        "dev": "node --watch src/server.js"
+        "dev": "node --watch src/server.js",
+        "local": "node src/server-local.js",
+        "dev:local": "node --watch src/server-local.js",
+        "seed": "node src/seed.js"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.43.4",
