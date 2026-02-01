@@ -143,20 +143,26 @@ export const localStore = {
             percentage: total > 0 ? Math.round((count / total) * 100) : 0
         })).sort((a, b) => b.commit_count - a.commit_count);
         
-        // Timeline (last 30 days)
-        const timeline = [];
-        for (let i = 29; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
-            const dayCommits = repoCommits.filter(c => 
-                c.commit_date && c.commit_date.startsWith(dateStr)
-            );
-            timeline.push({
-                date: dateStr,
-                count: dayCommits.length
-            });
-        }
+        // Timeline (last 30 days) with commits_by_author
+        const timelineMap = {};
+        repoCommits.forEach(commit => {
+            const date = commit.commit_date.split('T')[0]; // Get date part only
+            const author = commit.author || "Unknown";
+
+            if (!timelineMap[date]) {
+                timelineMap[date] = {};
+            }
+            if (!timelineMap[date][author]) {
+                timelineMap[date][author] = 0;
+            }
+            timelineMap[date][author]++;
+        });
+
+        // Convert timeline map to array
+        const timeline = Object.entries(timelineMap).map(([date, commits_by_author]) => ({
+            date,
+            commits_by_author
+        })).sort((a, b) => new Date(a.date) - new Date(b.date));
         
         return { contributors, timeline, total_commits: total };
     },

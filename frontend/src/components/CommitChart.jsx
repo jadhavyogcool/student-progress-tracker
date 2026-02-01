@@ -43,7 +43,7 @@ export default function CommitChart({ timeline, contributors }) {
 
     // Create datasets for each author
     const datasets = authors.map((author, index) => {
-        const data = timeline.map(t => t.commits_by_author[author] || 0);
+        const data = timeline.map(t => (t.commits_by_author && t.commits_by_author[author]) || 0);
         const color = colors[index % colors.length];
 
         return {
