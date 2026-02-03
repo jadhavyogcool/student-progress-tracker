@@ -50,29 +50,29 @@ export default function AdminLogin({ onLogin }) {
                         <h1 className="login-title">Admin Access</h1>
                         <p className="login-subtitle">Scholar Progress Tracker</p>
                     </div>
-                <form onSubmit={handleSubmit} className="login-form">
-                    <div className="input-group">
-                        <label>Admin Password</label>
-                        <input
-                            type="password"
-                            className="form-input"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter admin password"
-                            required
-                            autoFocus
-                        />
-                    </div>
-                    {error && <div className="login-error">{error}</div>}
-                    <button type="submit" className="btn-primary" disabled={loading}>
-                        {loading ? "Authenticating..." : "Sign In"}
-                    </button>
-                    <div className="login-footer">
-                        <p>Default password: admin123</p>
-                    </div>
-                </form>
+                    <form onSubmit={handleSubmit} className="login-form">
+                        <div className="input-group">
+                            <label>Admin Password</label>
+                            <input
+                                type="password"
+                                className="form-input"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter admin password"
+                                required
+                                autoFocus
+                            />
+                        </div>
+                        {error && <div className="login-error">{error}</div>}
+                        <button type="submit" className="btn-primary" disabled={loading}>
+                            {loading ? "Authenticating..." : "Sign In"}
+                        </button>
+                        <div className="login-footer">
+                            <p>Default password: admin123</p>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
         </div>
     );
 }

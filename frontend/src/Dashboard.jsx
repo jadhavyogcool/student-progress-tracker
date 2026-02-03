@@ -75,9 +75,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
         } catch (err) {
             console.error("Failed to fetch contributor data", err);
             // Set empty data so section still renders
-            setContributorData(prev => ({ 
-                ...prev, 
-                [repoId]: { contributors: [], timeline: [], total_commits: 0 } 
+            setContributorData(prev => ({
+                ...prev,
+                [repoId]: { contributors: [], timeline: [], total_commits: 0 }
             }));
         }
     };
@@ -148,7 +148,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
     const handleSyncAll = async () => {
         try {
             const allRepos = students.flatMap(s => s.repositories || []);
-            await Promise.all(allRepos.map(repo => 
+            await Promise.all(allRepos.map(repo =>
                 fetch(`${API_BASE}/api/sync/${repo.id}`, { method: "POST" })
             ));
             fetchData();
@@ -204,12 +204,12 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
         }
     };
 
-    const filteredStudents = students.filter(s => 
+    const filteredStudents = students.filter(s =>
         s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.email?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const allRepositories = students.flatMap(s => 
+    const allRepositories = students.flatMap(s =>
         (s.repositories || []).map(r => ({ ...r, studentName: s.name, studentEmail: s.email }))
     );
 
@@ -442,8 +442,8 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                         </div>
                         <div className="leaderboard-list">
                             {leaderboard.map((item, index) => (
-                                <div 
-                                    key={item.id} 
+                                <div
+                                    key={item.id}
                                     className="leaderboard-item clickable"
                                     onClick={() => showStudentDetail(item.student_name)}
                                 >
@@ -459,7 +459,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                                     </div>
                                     <div className="view-arrow">
                                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
                                         </svg>
                                     </div>
                                 </div>
@@ -508,8 +508,8 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                         </div>
                         <div className="activity-list">
                             {leaderboard.slice(0, 3).map((item, i) => (
-                                <div 
-                                    key={item.id} 
+                                <div
+                                    key={item.id}
                                     className="activity-item clickable"
                                     onClick={() => showStudentDetail(item.student_name)}
                                 >
@@ -537,7 +537,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                             </div>
                             <button className="close-btn" onClick={() => { setSelectedStudent(null); setStudentDetailData(null); }}>
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                                 </svg>
                             </button>
                         </div>
@@ -593,7 +593,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                                         {repo.consistency?.is_cramming && (
                                             <div className="cramming-warning">
                                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
                                                 </svg>
                                                 Cramming detected: {repo.consistency.cramming_percentage}% commits in last 48h
                                             </div>
@@ -911,8 +911,8 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                     <div className="settings-section-header">
                         <div className="settings-section-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                <circle cx="12" cy="7" r="4"/>
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
                             </svg>
                         </div>
                         <div>
@@ -941,9 +941,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                             <div className="settings-row-right">
                                 <button className="btn-outline-danger" onClick={handleLogout}>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                        <polyline points="16,17 21,12 16,7"/>
-                                        <line x1="21" y1="12" x2="9" y2="12"/>
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                        <polyline points="16,17 21,12 16,7" />
+                                        <line x1="21" y1="12" x2="9" y2="12" />
                                     </svg>
                                     Sign Out
                                 </button>
@@ -957,9 +957,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                     <div className="settings-section-header">
                         <div className="settings-section-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                             </svg>
                         </div>
                         <div>
@@ -976,7 +976,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                             <div className="settings-row-right">
                                 <button className="btn-action" onClick={handleSyncAll}>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                                        <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
                                     </svg>
                                     Sync All
                                 </button>
@@ -990,9 +990,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                             <div className="settings-row-right">
                                 <button className="btn-action" onClick={fetchData}>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <polyline points="23,4 23,10 17,10"/>
-                                        <polyline points="1,20 1,14 7,14"/>
-                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                                        <polyline points="23,4 23,10 17,10" />
+                                        <polyline points="1,20 1,14 7,14" />
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
                                     </svg>
                                     Refresh
                                 </button>
@@ -1006,9 +1006,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                             <div className="settings-row-right">
                                 <button className="btn-action" onClick={() => alert('Export feature coming soon!')}>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                        <polyline points="7,10 12,15 17,10"/>
-                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7,10 12,15 17,10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
                                     </svg>
                                     Export
                                 </button>
@@ -1022,8 +1022,8 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                     <div className="settings-section-header">
                         <div className="settings-section-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                             </svg>
                         </div>
                         <div>
@@ -1066,10 +1066,10 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                     <div className="settings-section-header">
                         <div className="settings-section-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <rect x="3" y="3" width="7" height="7"/>
-                                <rect x="14" y="3" width="7" height="7"/>
-                                <rect x="14" y="14" width="7" height="7"/>
-                                <rect x="3" y="14" width="7" height="7"/>
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
                             </svg>
                         </div>
                         <div>
@@ -1129,7 +1129,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                         <span className="logo-text">Scholar</span>
                     </div>
                 </div>
-                
+
                 <nav className="sidebar-nav">
                     <div className="nav-section">
                         <div className="nav-section-title">Platform</div>
@@ -1146,7 +1146,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                             Leaderboard
                         </button>
                     </div>
-                    
+
                     <div className="nav-section">
                         <div className="nav-section-title">Management</div>
                         <button className={`nav-item ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>
@@ -1169,7 +1169,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                         </div>
                     )}
                 </nav>
-                
+
                 <div className="sidebar-footer">
                     {isAuthenticated ? (
                         <div className="user-info">

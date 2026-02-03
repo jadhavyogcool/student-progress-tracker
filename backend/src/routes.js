@@ -160,20 +160,20 @@ router.get("/analytics/students", async (req, res) => {
     try {
         const { students, repos, commits } = await getGlobalData();
         const enrichedStudents = students.map(student => {
-             const studentRepos = repos.filter(r => r.student_id === student.id);
-             const studentCommits = commits.filter(c => studentRepos.some(r => r.id === c.repo_id));
-             
-             return {
-                 ...student,
-                 repositories: studentRepos.map(r => ({
-                     ...r,
-                     analytics: {
-                         quality: { grade: 'B', totalCommits: commits.filter(c => c.repo_id === r.id).length },
-                         consistency: { active_days: 10, is_cramming: false },
-                         milestones: { progress: 50, current_commits: commits.filter(c => c.repo_id === r.id).length }
-                     }
-                 }))
-             };
+            const studentRepos = repos.filter(r => r.student_id === student.id);
+            const studentCommits = commits.filter(c => studentRepos.some(r => r.id === c.repo_id));
+
+            return {
+                ...student,
+                repositories: studentRepos.map(r => ({
+                    ...r,
+                    analytics: {
+                        quality: { grade: 'B', totalCommits: commits.filter(c => c.repo_id === r.id).length },
+                        consistency: { active_days: 10, is_cramming: false },
+                        milestones: { progress: 50, current_commits: commits.filter(c => c.repo_id === r.id).length }
+                    }
+                }))
+            };
         });
         res.json(enrichedStudents);
     } catch (e) {
@@ -187,11 +187,11 @@ router.get("/analytics/students", async (req, res) => {
 router.get("/leaderboard", async (_, res) => {
     try {
         const { students, repos, commits } = await getGlobalData();
-        
+
         const leaderboard = repos.map(repo => {
             const repoCommits = commits.filter(c => c.repo_id === repo.id).length;
             const student = students.find(s => s.id === repo.student_id);
-            
+
             return {
                 id: repo.id,
                 name: repo.repo_name,
@@ -211,9 +211,9 @@ router.get("/leaderboard", async (_, res) => {
 // Analytics Leaderboard (Detailed)
 router.get("/analytics/leaderboard/:period", async (req, res) => {
     try {
-        const { period } = req.params; 
+        const { period } = req.params;
         const { students, repos, commits } = await getGlobalData();
-        
+
         const now = new Date();
         let startDate = new Date(0);
         if (period === 'weekly') startDate = new Date(now - 7 * 86400000);
@@ -223,7 +223,7 @@ router.get("/analytics/leaderboard/:period", async (req, res) => {
             const studentRepoIds = repos.filter(r => r.student_id === student.id).map(r => r.id);
             const studentCommits = commits.filter(c => studentRepoIds.includes(c.repo_id) && new Date(c.commit_date) >= startDate);
             const totalCommits = studentCommits.length;
-            
+
             return {
                 student_id: student.id,
                 name: student.name,
@@ -235,7 +235,7 @@ router.get("/analytics/leaderboard/:period", async (req, res) => {
             };
         });
 
-        rankings.sort((a,b) => b.overallScore - a.overallScore);
+        rankings.sort((a, b) => b.overallScore - a.overallScore);
         const ranks = rankings.map((r, i) => ({ ...r, rank: i + 1 }));
 
         res.json({
@@ -254,16 +254,16 @@ router.get("/analytics/class", async (_, res) => {
     try {
         const { students, repos, commits } = await getGlobalData();
         const total_students = students.length || 1;
-        
+
         // Heatmap: Map commits to [week, day] buckets
         // Simplified: Returning mock heatmap structure but consistent
-        const heatmap = []; 
-        for(let w=0; w<12; w++) {
-            for(let d=0; d<7; d++) {
-                heatmap.push({ week: w, day: d, count: Math.floor(Math.random() * 3) }); 
+        const heatmap = [];
+        for (let w = 0; w < 12; w++) {
+            for (let d = 0; d < 7; d++) {
+                heatmap.push({ week: w, day: d, count: Math.floor(Math.random() * 3) });
             }
         }
-        
+
         res.json({
             total_students: students.length,
             total_repos: repos.length,
@@ -271,7 +271,7 @@ router.get("/analytics/class", async (_, res) => {
             avg_commits_per_repo: repos.length ? Number((commits.length / repos.length).toFixed(1)) : 0,
             avg_consistency_score: 85, // Mock
             heatmap: heatmap,
-            summary: { recent_commits: commits.slice(0,100).length } // Just a count
+            summary: { recent_commits: commits.slice(0, 100).length } // Just a count
         });
     } catch (e) {
         res.status(500).json({ error: e.message });
@@ -283,12 +283,12 @@ router.get("/analytics/compare/:id1/:id2", async (req, res) => {
     try {
         const { id1, id2 } = req.params;
         const { students, repos, commits } = await getGlobalData();
-        
+
         const getMetrics = (id) => {
             const sRepos = repos.filter(r => r.student_id === id).map(r => r.id);
             const sCommits = commits.filter(c => sRepos.includes(c.repo_id));
             const student = students.find(s => s.id === id);
-            
+
             return {
                 name: student?.name || "Unknown",
                 metrics: {
@@ -311,7 +311,7 @@ router.get("/analytics/compare/:id1/:id2", async (req, res) => {
             student2: getMetrics(id2)
         });
     } catch (e) {
-         res.status(500).json({ error: e.message });
+        res.status(500).json({ error: e.message });
     }
 });
 
@@ -320,20 +320,20 @@ router.get("/analytics/badges/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const { repos, commits } = await getGlobalData();
-        
+
         const sRepos = repos.filter(r => r.student_id === id).map(r => r.id);
         const sCommits = commits.filter(c => sRepos.includes(c.repo_id)).length;
-        
+
         const allBadges = [
             { id: 1, name: 'First Commit', icon: '🚀', description: 'Pushed first line of code', threshold: 1 },
             { id: 2, name: 'Active Coder', icon: '🔥', description: 'Reached 10 commits', threshold: 10 },
             { id: 3, name: 'Pro Developer', icon: '💻', description: 'Reached 50 commits', threshold: 50 },
             { id: 4, name: 'Expert', icon: '🏆', description: 'Reached 100 commits', threshold: 100 }
         ];
-        
+
         const earned = allBadges.filter(b => sCommits >= b.threshold);
-        const locked = allBadges.filter(b => sCommits < b.threshold).map(b => ({...b, requirement: `${b.threshold} total commits`}));
-        
+        const locked = allBadges.filter(b => sCommits < b.threshold).map(b => ({ ...b, requirement: `${b.threshold} total commits` }));
+
         res.json({
             totalEarned: earned.length,
             totalPossible: allBadges.length,
@@ -352,21 +352,21 @@ router.get("/analytics/timeline/:id", async (req, res) => {
         const { repos, commits } = await getGlobalData();
         const sRepos = repos.filter(r => r.student_id === id).map(r => r.id);
         const sCommits = commits.filter(c => sRepos.includes(c.repo_id));
-        
+
         // Group by week (last 12 weeks)
         const timeline = [];
-        for(let i=11; i>=0; i--) {
-            const start = new Date(Date.now() - (i+1)*7*86400000);
-            const end = new Date(Date.now() - i*7*86400000);
+        for (let i = 11; i >= 0; i--) {
+            const start = new Date(Date.now() - (i + 1) * 7 * 86400000);
+            const end = new Date(Date.now() - i * 7 * 86400000);
             const count = sCommits.filter(c => {
                 const d = new Date(c.commit_date);
                 return d >= start && d < end;
             }).length;
-            timeline.push({ week: 12-i, commits: count });
+            timeline.push({ week: 12 - i, commits: count });
         }
-        
+
         res.json({
-            summary: { totalWeeks: 12, totalCommits: sCommits.length, avgCommitsPerWeek: (sCommits.length/12).toFixed(1) },
+            summary: { totalWeeks: 12, totalCommits: sCommits.length, avgCommitsPerWeek: (sCommits.length / 12).toFixed(1) },
             timeline,
             milestones: []
         });
@@ -380,22 +380,22 @@ router.get("/analytics/at-risk", async (_, res) => {
     try {
         const { students, repos, commits } = await getGlobalData();
         const lastWeek = new Date(Date.now() - 7 * 86400000);
-        
+
         const atRisk = [];
         students.forEach(student => {
-             const studentRepoIds = repos.filter(r => r.student_id === student.id).map(r => r.id);
-             const recentCommits = commits.filter(c => studentRepoIds.includes(c.repo_id) && new Date(c.commit_date) >= lastWeek).length;
-             const totalCommits = commits.filter(c => studentRepoIds.includes(c.repo_id)).length;
-             
-             if (recentCommits < 2) {
-                 atRisk.push({
-                     student: { name: student.name, email: student.email },
-                     riskScore: recentCommits === 0 ? 3 : 1,
-                     totalCommits,
-                     recentCommits,
-                     issues: [{ severity: 'high', message: 'Low commit frequency' }]
-                 });
-             }
+            const studentRepoIds = repos.filter(r => r.student_id === student.id).map(r => r.id);
+            const recentCommits = commits.filter(c => studentRepoIds.includes(c.repo_id) && new Date(c.commit_date) >= lastWeek).length;
+            const totalCommits = commits.filter(c => studentRepoIds.includes(c.repo_id)).length;
+
+            if (recentCommits < 2) {
+                atRisk.push({
+                    student: { name: student.name, email: student.email },
+                    riskScore: recentCommits === 0 ? 3 : 1,
+                    totalCommits,
+                    recentCommits,
+                    issues: [{ severity: 'high', message: 'Low commit frequency' }]
+                });
+            }
         });
         res.json(atRisk);
     } catch (e) {
@@ -404,10 +404,12 @@ router.get("/analytics/at-risk", async (_, res) => {
 });
 
 /* Other Endpoints */
-router.get("/analytics/tech-stack", (_, res) => res.json({ technologies: [
-    { name: 'JavaScript', count: 100, category: 'Language' },
-    { name: 'Python', count: 50, category: 'Language' }
-] }));
+router.get("/analytics/tech-stack", (_, res) => res.json({
+    technologies: [
+        { name: 'JavaScript', count: 100, category: 'Language' },
+        { name: 'Python', count: 50, category: 'Language' }
+    ]
+}));
 
 router.get("/milestones", (_, res) => res.json([
     { id: 1, name: "Project Inception", target_commits: 20 },
@@ -459,17 +461,17 @@ async function syncHandler(req, res) {
 router.get("/repository/:repoId/contributors", async (req, res) => {
     try {
         const { data: commits } = await supabase.from("commits").select("*").eq("repo_id", req.params.repoId);
-        if(!commits || !commits.length) return res.json({ total_commits: 0, contributors: [], timeline: [] });
-        
+        if (!commits || !commits.length) return res.json({ total_commits: 0, contributors: [], timeline: [] });
+
         const map = {};
         commits.forEach(c => {
-             const a = c.author || "Unknown";
-             if(!map[a]) map[a] = { author: a, commit_count: 0 };
-             map[a].commit_count++;
+            const a = c.author || "Unknown";
+            if (!map[a]) map[a] = { author: a, commit_count: 0 };
+            map[a].commit_count++;
         });
-        
+
         const total = commits.length;
-        const contributors = Object.values(map).map(c => ({...c, percentage: ((c.commit_count/total)*100).toFixed(1)}));
+        const contributors = Object.values(map).map(c => ({ ...c, percentage: ((c.commit_count / total) * 100).toFixed(1) }));
         res.json({ total_commits: total, contributors, timeline: [] });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });

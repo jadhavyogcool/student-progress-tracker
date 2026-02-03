@@ -10,10 +10,10 @@ export const localStore = {
     getStudents: () => students,
     getStudentById: (id) => students.find(s => s.id === id),
     addStudent: (student) => {
-        const newStudent = { 
-            ...student, 
-            id: idCounters.students++, 
-            created_at: new Date().toISOString() 
+        const newStudent = {
+            ...student,
+            id: idCounters.students++,
+            created_at: new Date().toISOString()
         };
         students.push(newStudent);
         return newStudent;
@@ -36,10 +36,10 @@ export const localStore = {
     getRepositoryById: (id) => repositories.find(r => r.id === id),
     getRepositoriesByStudentId: (studentId) => repositories.filter(r => r.student_id === studentId),
     addRepository: (repo) => {
-        const newRepo = { 
-            ...repo, 
-            id: idCounters.repositories++, 
-            created_at: new Date().toISOString() 
+        const newRepo = {
+            ...repo,
+            id: idCounters.repositories++,
+            created_at: new Date().toISOString()
         };
         repositories.push(newRepo);
         return newRepo;
@@ -52,11 +52,11 @@ export const localStore = {
         // Check if commit with same SHA exists
         const existing = commits.find(c => c.sha === commit.sha && c.repo_id === commit.repo_id);
         if (existing) return existing;
-        
-        const newCommit = { 
-            ...commit, 
-            id: idCounters.commits++, 
-            created_at: new Date().toISOString() 
+
+        const newCommit = {
+            ...commit,
+            id: idCounters.commits++,
+            created_at: new Date().toISOString()
         };
         commits.push(newCommit);
         return newCommit;
@@ -74,7 +74,7 @@ export const localStore = {
     getSummary: () => {
         const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
         const activeCommits = commits.filter(c => new Date(c.commit_date) >= sevenDaysAgo);
-        
+
         return {
             students: students.length,
             repositories: repositories.length,
@@ -93,10 +93,10 @@ export const localStore = {
                     const repoCommits = commits.filter(c => c.repo_id === repo.id);
                     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
                     const recentCommits = repoCommits.filter(c => new Date(c.commit_date) >= sevenDaysAgo);
-                    const lastCommit = repoCommits.sort((a, b) => 
+                    const lastCommit = repoCommits.sort((a, b) =>
                         new Date(b.commit_date) - new Date(a.commit_date)
                     )[0];
-                    
+
                     return {
                         ...repo,
                         insights: {
@@ -127,7 +127,7 @@ export const localStore = {
     getContributors: (repoId) => {
         const repoCommits = commits.filter(c => c.repo_id === repoId);
         const contributorMap = {};
-        
+
         repoCommits.forEach(commit => {
             const author = commit.author || 'Unknown';
             if (!contributorMap[author]) {
@@ -135,14 +135,14 @@ export const localStore = {
             }
             contributorMap[author]++;
         });
-        
+
         const total = repoCommits.length;
         const contributors = Object.entries(contributorMap).map(([author, count]) => ({
             author,
             commit_count: count,
             percentage: total > 0 ? Math.round((count / total) * 100) : 0
         })).sort((a, b) => b.commit_count - a.commit_count);
-        
+
         // Timeline (last 30 days) with commits_by_author
         const timelineMap = {};
         repoCommits.forEach(commit => {
@@ -163,7 +163,7 @@ export const localStore = {
             date,
             commits_by_author
         })).sort((a, b) => new Date(a.date) - new Date(b.date));
-        
+
         return { contributors, timeline, total_commits: total };
     },
 
