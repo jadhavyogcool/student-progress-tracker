@@ -36,6 +36,13 @@ app.use(cors({
 
 app.use(express.json());
 
+// Avoid 304 responses for API fetches in browsers
+app.set("etag", false);
+app.use((req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+});
+
 // For production (e.g. Render), trust the first proxy
 app.set("trust proxy", 1);
 
