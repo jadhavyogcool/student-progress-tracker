@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 
 const getApiUrl = () => {
+    // If running on Vercel (production), use the production backend
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        return 'https://student-progress-tracker-phi.vercel.app';
+    }
+    // Otherwise use env var or localhost
     const url = import.meta.env.VITE_API_URL;
     if (!url) return "http://localhost:3000";
     if (url.startsWith("http")) return url;
@@ -13,7 +18,7 @@ const API_URL = `${getApiUrl()}/api`;
 function CommitHeatmap({ data }) {
     const weeks = [];
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
+
     // Generate 12 weeks of data
     for (let w = 0; w < 12; w++) {
         const week = [];
@@ -43,8 +48,8 @@ function CommitHeatmap({ data }) {
                 {weeks.map((week, wi) => (
                     <div key={wi} className="heatmap-week">
                         {week.map((count, di) => (
-                            <div 
-                                key={di} 
+                            <div
+                                key={di}
                                 className="heatmap-cell"
                                 style={{ backgroundColor: getColor(count) }}
                                 title={`${count} commits`}
@@ -77,7 +82,7 @@ function TechStackCloud({ data }) {
     }
 
     const maxCount = Math.max(...data.map(t => t.count || 1));
-    
+
     const getSize = (count) => {
         const ratio = (count || 1) / maxCount;
         return Math.max(14, Math.min(42, 14 + ratio * 28));
@@ -89,10 +94,10 @@ function TechStackCloud({ data }) {
     return (
         <div className="tech-cloud">
             {data.map((tech, i) => (
-                <span 
+                <span
                     key={i}
                     className="tech-tag"
-                    style={{ 
+                    style={{
                         fontSize: `${getSize(tech.count)}px`,
                         color: colors[i % colors.length],
                         opacity: 0.8 + ((tech.count || 1) / maxCount) * 0.2
@@ -110,7 +115,7 @@ function TechStackCloud({ data }) {
 function ContributionPie({ contributors }) {
     const total = contributors?.reduce((sum, c) => sum + c.commit_count, 0) || 0;
     const colors = ['#1a1a2e', '#3a86ff', '#8338ec', '#ff006e', '#fb5607', '#ffbe0b'];
-    
+
     let currentAngle = 0;
     const slices = contributors?.map((c, i) => {
         const angle = (c.commit_count / total) * 360;
@@ -139,7 +144,7 @@ function ContributionPie({ contributors }) {
                     const start = getCoordinates(slice.startAngle, 80);
                     const end = getCoordinates(slice.endAngle, 80);
                     const largeArc = slice.endAngle - slice.startAngle > 180 ? 1 : 0;
-                    
+
                     return (
                         <path
                             key={i}
@@ -171,8 +176,8 @@ function MilestoneRaceTrack({ progress, milestones }) {
                 {milestones?.map((m, i) => {
                     const position = (m.target_commits / Math.max(...milestones.map(x => x.target_commits))) * 100;
                     return (
-                        <div 
-                            key={i} 
+                        <div
+                            key={i}
                             className="milestone-marker"
                             style={{ left: `${position}%` }}
                         >
@@ -181,12 +186,12 @@ function MilestoneRaceTrack({ progress, milestones }) {
                         </div>
                     );
                 })}
-                <div 
+                <div
                     className="progress-car"
                     style={{ left: `${Math.min(progress?.progress || 0, 100)}%` }}
                 >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
                     </svg>
                 </div>
             </div>
@@ -223,7 +228,7 @@ function CrammingAlert({ data }) {
     return (
         <div className="cramming-alert">
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
             </svg>
             <div className="alert-content">
                 <strong>Cramming Detected</strong>
@@ -305,12 +310,12 @@ function RepoDetailsModal({ repoId, repoData, onClose }) {
                                 <span className="insight-label">Good Messages</span>
                             </div>
                         </div>
-                        
+
                         <div className="insight-section">
                             <h4>Summary</h4>
                             <p>{details.summary || 'No summary available'}</p>
                         </div>
-                        
+
                         {details.patterns?.length > 0 && (
                             <div className="insight-section">
                                 <h4>Work Patterns</h4>
@@ -319,7 +324,7 @@ function RepoDetailsModal({ repoId, repoData, onClose }) {
                                 </ul>
                             </div>
                         )}
-                        
+
                         {details.recommendations?.length > 0 && (
                             <div className="insight-section">
                                 <h4>Recommendations</h4>
@@ -328,7 +333,7 @@ function RepoDetailsModal({ repoId, repoData, onClose }) {
                                 </ul>
                             </div>
                         )}
-                        
+
                         {details.topics?.length > 0 && (
                             <div className="insight-section">
                                 <h4>Tech Stack</h4>
@@ -390,14 +395,14 @@ function Leaderboard({ period, onPeriodChange }) {
     };
 
     if (loading) return <div className="loading-spinner">Loading leaderboard...</div>;
-    
+
     if (error) return (
         <div className="error-state">
             <p>Failed to load leaderboard. Make sure backend is running.</p>
             <code>{error}</code>
         </div>
     );
-    
+
     if (!data || !data.rankings || data.rankings.length === 0) return (
         <div className="empty-state">
             <h3>No Data Yet</h3>
@@ -542,7 +547,7 @@ function StudentComparison({ students }) {
             </div>
 
             {loading && <div className="loading-spinner">Comparing...</div>}
-            
+
             {error && (
                 <div className="error-state">
                     <p>Failed to compare students.</p>
@@ -577,42 +582,42 @@ function StudentComparison({ students }) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="metrics-comparison">
                         <h4>Performance Metrics</h4>
                         <div className="comparison-bars">
-                            <CompareBar 
-                                label="Total Commits" 
+                            <CompareBar
+                                label="Total Commits"
                                 value1={comparison.student1.metrics.totalCommits}
                                 value2={comparison.student2.metrics.totalCommits}
                                 max={Math.max(comparison.student1.metrics.totalCommits, comparison.student2.metrics.totalCommits)}
                             />
-                            <CompareBar 
-                                label="Active Days" 
+                            <CompareBar
+                                label="Active Days"
                                 value1={comparison.student1.metrics.activeDays || 0}
                                 value2={comparison.student2.metrics.activeDays || 0}
                                 max={Math.max(comparison.student1.metrics.activeDays || 0, comparison.student2.metrics.activeDays || 0) || 1}
                             />
-                            <CompareBar 
-                                label="Quality Score" 
+                            <CompareBar
+                                label="Quality Score"
                                 value1={comparison.student1.metrics.qualityScore || 0}
                                 value2={comparison.student2.metrics.qualityScore || 0}
                                 max={100}
                             />
-                            <CompareBar 
-                                label="Current Streak" 
+                            <CompareBar
+                                label="Current Streak"
                                 value1={comparison.student1.metrics.currentStreak || 0}
                                 value2={comparison.student2.metrics.currentStreak || 0}
                                 max={Math.max(comparison.student1.metrics.currentStreak || 0, comparison.student2.metrics.currentStreak || 0) || 1}
                             />
-                            <CompareBar 
-                                label="Longest Streak" 
+                            <CompareBar
+                                label="Longest Streak"
                                 value1={comparison.student1.metrics.longestStreak || 0}
                                 value2={comparison.student2.metrics.longestStreak || 0}
                                 max={Math.max(comparison.student1.metrics.longestStreak || 0, comparison.student2.metrics.longestStreak || 0) || 1}
                             />
-                            <CompareBar 
-                                label="Repositories" 
+                            <CompareBar
+                                label="Repositories"
                                 value1={comparison.student1.metrics.repoCount || 0}
                                 value2={comparison.student2.metrics.repoCount || 0}
                                 max={Math.max(comparison.student1.metrics.repoCount || 0, comparison.student2.metrics.repoCount || 0) || 1}
@@ -769,14 +774,14 @@ function ProgressTimeline({ studentId }) {
     }, [studentId]);
 
     if (loading) return <div className="loading-spinner">Loading timeline...</div>;
-    
+
     if (error) return (
         <div className="error-state">
             <p>Failed to load timeline.</p>
             <code>{error}</code>
         </div>
     );
-    
+
     if (!timeline || timeline.error) return (
         <div className="empty-state">
             <h3>No Timeline Data</h3>
@@ -794,12 +799,12 @@ function ProgressTimeline({ studentId }) {
                 <span>{timeline.summary?.totalCommits} commits</span>
                 <span>~{timeline.summary?.avgCommitsPerWeek} commits/week</span>
             </div>
-            
+
             <div className="timeline-chart">
                 {timeline.timeline?.slice(-12).map((week, i) => (
                     <div key={i} className="timeline-bar-container">
-                        <div 
-                            className="timeline-bar" 
+                        <div
+                            className="timeline-bar"
                             style={{ height: `${(week.commits / maxCommits) * 100}%` }}
                             title={`${week.commits} commits`}
                         >
@@ -895,50 +900,50 @@ export default function Analytics() {
                     fetch(`${API_URL}/analytics/students`).then(r => r.ok ? r.json() : []),
                     fetch(`${API_URL}/analytics/at-risk`).then(r => r.ok ? r.json() : []).catch(() => [])
                 ]);
-                
+
                 console.log('Loaded data:', { classRes, techRes, studentsRes });
-            // Use class data directly from backend if available
-            if (classRes.total_students !== undefined) {
-                setClassData(classRes);
-            } else {
-                // Fallback transformation
-                const totalCommits = studentsRes.reduce((sum, s) => 
-                    sum + (s.repositories?.reduce((rSum, r) => rSum + (r.insights?.total_commits || 0), 0) || 0), 0
-                );
-                
-                const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
-                const crammingAlerts = [];
-                
-                studentsRes.forEach(student => {
-                    student.repositories?.forEach(repo => {
-                        const grade = repo.analytics?.quality?.grade || 'C';
-                        if (gradeDistribution.hasOwnProperty(grade)) {
-                            gradeDistribution[grade]++;
-                        }
-                        if (repo.analytics?.consistency?.is_cramming) {
-                            crammingAlerts.push({
-                                student: student.name,
-                                repo: repo.repo_name,
-                                percentage: repo.analytics.consistency.cramming_percentage || 50
-                            });
-                        }
+                // Use class data directly from backend if available
+                if (classRes.total_students !== undefined) {
+                    setClassData(classRes);
+                } else {
+                    // Fallback transformation
+                    const totalCommits = studentsRes.reduce((sum, s) =>
+                        sum + (s.repositories?.reduce((rSum, r) => rSum + (r.insights?.total_commits || 0), 0) || 0), 0
+                    );
+
+                    const gradeDistribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+                    const crammingAlerts = [];
+
+                    studentsRes.forEach(student => {
+                        student.repositories?.forEach(repo => {
+                            const grade = repo.analytics?.quality?.grade || 'C';
+                            if (gradeDistribution.hasOwnProperty(grade)) {
+                                gradeDistribution[grade]++;
+                            }
+                            if (repo.analytics?.consistency?.is_cramming) {
+                                crammingAlerts.push({
+                                    student: student.name,
+                                    repo: repo.repo_name,
+                                    percentage: repo.analytics.consistency.cramming_percentage || 50
+                                });
+                            }
+                        });
                     });
-                });
 
-                const totalRepos = studentsRes.reduce((sum, s) => sum + (s.repositories?.length || 0), 0);
+                    const totalRepos = studentsRes.reduce((sum, s) => sum + (s.repositories?.length || 0), 0);
 
-                setClassData({
-                    total_students: studentsRes.length,
-                    total_repos: totalRepos,
-                    total_commits: totalCommits,
-                    avg_commits_per_repo: totalRepos > 0 ? totalCommits / totalRepos : 0,
-                    grade_distribution: gradeDistribution,
-                    cramming_alerts: crammingAlerts,
-                    heatmap: classRes.heatmap || [],
-                    summary: classRes.summary || {}
-                });
-            }
-            
+                    setClassData({
+                        total_students: studentsRes.length,
+                        total_repos: totalRepos,
+                        total_commits: totalCommits,
+                        avg_commits_per_repo: totalRepos > 0 ? totalCommits / totalRepos : 0,
+                        grade_distribution: gradeDistribution,
+                        cramming_alerts: crammingAlerts,
+                        heatmap: classRes.heatmap || [],
+                        summary: classRes.summary || {}
+                    });
+                }
+
                 // Transform tech stack data
                 setTechStack(techRes.technologies || techRes || []);
                 setMilestones(milestonesRes || []);
@@ -979,49 +984,49 @@ export default function Analytics() {
         <div className="analytics-dashboard">
             {/* Tab Navigation */}
             <div className="analytics-tabs">
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
                     onClick={() => setActiveTab('overview')}
                 >
                     Class Overview
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`}
                     onClick={() => setActiveTab('leaderboard')}
                 >
                     Leaderboard
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'compare' ? 'active' : ''}`}
                     onClick={() => setActiveTab('compare')}
                 >
                     Compare
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`}
                     onClick={() => setActiveTab('students')}
                 >
                     Student Analytics
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'timeline' ? 'active' : ''}`}
                     onClick={() => setActiveTab('timeline')}
                 >
                     Timeline
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'atrisk' ? 'active' : ''}`}
                     onClick={() => setActiveTab('atrisk')}
                 >
                     At Risk {atRiskStudents.length > 0 && <span className="badge-count">{atRiskStudents.length}</span>}
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'tech' ? 'active' : ''}`}
                     onClick={() => setActiveTab('tech')}
                 >
                     Tech Radar
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'milestones' ? 'active' : ''}`}
                     onClick={() => setActiveTab('milestones')}
                 >
@@ -1061,7 +1066,7 @@ export default function Analytics() {
                         <div className="metric-card blue">
                             <div className="metric-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z" />
                                 </svg>
                             </div>
                             <div className="metric-info">
@@ -1075,7 +1080,7 @@ export default function Analytics() {
                         <div className="metric-card purple">
                             <div className="metric-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/>
+                                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" />
                                 </svg>
                             </div>
                             <div className="metric-info">
@@ -1089,7 +1094,7 @@ export default function Analytics() {
                         <div className="metric-card green">
                             <div className="metric-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                                 </svg>
                             </div>
                             <div className="metric-info">
@@ -1103,7 +1108,7 @@ export default function Analytics() {
                         <div className="metric-card orange">
                             <div className="metric-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
                                 </svg>
                             </div>
                             <div className="metric-info">
@@ -1173,7 +1178,7 @@ export default function Analytics() {
                             <div className="dash-card-body">
                                 <div className="performers-list">
                                     {studentsData?.slice(0, 5).map((student, i) => {
-                                        const totalCommits = student.repositories?.reduce((sum, r) => 
+                                        const totalCommits = student.repositories?.reduce((sum, r) =>
                                             sum + (r.analytics?.quality?.totalCommits || r.insights?.total_commits || 0), 0) || 0;
                                         return (
                                             <div key={student.id} className="performer-row">
@@ -1209,7 +1214,7 @@ export default function Analytics() {
                                             <div key={i} className="alert-dashboard-item">
                                                 <div className="alert-icon-wrapper">
                                                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
                                                     </svg>
                                                 </div>
                                                 <div className="alert-dashboard-content">
@@ -1222,7 +1227,7 @@ export default function Analytics() {
                                 ) : (
                                     <div className="no-alerts">
                                         <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                                         </svg>
                                         <span>All students on track!</span>
                                     </div>
@@ -1235,19 +1240,19 @@ export default function Analytics() {
                     <div className="quick-actions">
                         <button className="action-btn primary" onClick={() => setActiveTab('leaderboard')}>
                             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z"/>
+                                <path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z" />
                             </svg>
                             View Leaderboard
                         </button>
                         <button className="action-btn warning" onClick={() => setActiveTab('atrisk')}>
                             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
                             </svg>
                             Check At-Risk Students
                         </button>
                         <button className="action-btn secondary" onClick={() => setActiveTab('compare')}>
                             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h5v-2H5V5h5V3zm4 18h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-5v2h5v14h-5v2z"/>
+                                <path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h5v-2H5V5h5V3zm4 18h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-5v2h5v14h-5v2z" />
                             </svg>
                             Compare Students
                         </button>
@@ -1276,8 +1281,8 @@ export default function Analytics() {
                     <p className="section-subtitle">Track individual student progress over time</p>
                     <div className="timeline-selector-container">
                         <label>Select Student:</label>
-                        <select 
-                            value={selectedStudentForTimeline || ''} 
+                        <select
+                            value={selectedStudentForTimeline || ''}
                             onChange={e => setSelectedStudentForTimeline(e.target.value)}
                             className="student-select"
                         >
@@ -1295,7 +1300,7 @@ export default function Analytics() {
                     ) : (
                         <div className="empty-state">
                             <svg viewBox="0 0 24 24" width="64" height="64" fill="#94a3b8">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
                             </svg>
                             <h3>Select a Student</h3>
                             <p>Choose a student from the dropdown to view their progress timeline and achievements.</p>
@@ -1387,7 +1392,7 @@ export default function Analytics() {
                                                 </td>
                                                 <td>
                                                     <div className="usage-bar-premium">
-                                                        <div 
+                                                        <div
                                                             className="usage-fill-premium"
                                                             style={{ width: `${(tech.count / (techStack[0]?.count || 1)) * 100}%` }}
                                                         />
@@ -1439,66 +1444,66 @@ export default function Analytics() {
                 <div className="analytics-section">
                     <h2>Student Analytics</h2>
                     <p className="section-subtitle">Detailed analysis for each student's repositories</p>
-                    
+
                     {(!studentsData || studentsData.length === 0) ? (
                         <div className="empty-state">
                             <h3>No Students Found</h3>
                             <p>Add students to see their analytics here.</p>
                         </div>
                     ) : (
-                    <div className="students-grid">
-                        {studentsData.map(student => (
-                            <div key={student.id} className="student-analytics-card">
-                                <div className="student-header">
-                                    <div className="student-avatar-small">{student.name?.charAt(0) || '?'}</div>
-                                    <div>
-                                        <h3>{student.name}</h3>
-                                        <span className="student-email">{student.email}</span>
+                        <div className="students-grid">
+                            {studentsData.map(student => (
+                                <div key={student.id} className="student-analytics-card">
+                                    <div className="student-header">
+                                        <div className="student-avatar-small">{student.name?.charAt(0) || '?'}</div>
+                                        <div>
+                                            <h3>{student.name}</h3>
+                                            <span className="student-email">{student.email}</span>
+                                        </div>
+                                    </div>
+                                    <div className="student-repos">
+                                        {student.repositories?.length > 0 ? student.repositories.map(repo => (
+                                            <div key={repo.id} className="repo-analytics-item">
+                                                <div className="repo-info">
+                                                    <span className="repo-name">{repo.repo_name}</span>
+                                                    {repo.is_group && <span className="group-badge">Group</span>}
+                                                </div>
+                                                <div className="repo-quick-stats">
+                                                    <GradeBadge
+                                                        grade={repo.analytics?.quality?.grade || 'N/A'}
+                                                        label="Quality"
+                                                    />
+                                                    <div className="mini-stat">
+                                                        <span className="value">{repo.analytics?.quality?.totalCommits || repo.analytics?.quality?.total_commits || repo.insights?.total_commits || 0}</span>
+                                                        <span className="label">Commits</span>
+                                                    </div>
+                                                    <div className="mini-stat">
+                                                        <span className="value">{repo.analytics?.consistency?.active_days || 0}</span>
+                                                        <span className="label">Active Days</span>
+                                                    </div>
+                                                    {repo.analytics?.consistency?.isCramming && (
+                                                        <span className="cramming-badge">Cramming</span>
+                                                    )}
+                                                </div>
+                                                <div className="repo-actions">
+                                                    <button
+                                                        className="btn-detail"
+                                                        onClick={() => {
+                                                            setShowAISummary(repo.id);
+                                                            setSelectedRepoData(repo);
+                                                        }}
+                                                    >
+                                                        View Insights
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )) : (
+                                            <p className="no-repos">No repositories added yet</p>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="student-repos">
-                                    {student.repositories?.length > 0 ? student.repositories.map(repo => (
-                                        <div key={repo.id} className="repo-analytics-item">
-                                            <div className="repo-info">
-                                                <span className="repo-name">{repo.repo_name}</span>
-                                                {repo.is_group && <span className="group-badge">Group</span>}
-                                            </div>
-                                            <div className="repo-quick-stats">
-                                                <GradeBadge 
-                                                    grade={repo.analytics?.quality?.grade || 'N/A'} 
-                                                    label="Quality"
-                                                />
-                                                <div className="mini-stat">
-                                                    <span className="value">{repo.analytics?.quality?.totalCommits || repo.analytics?.quality?.total_commits || repo.insights?.total_commits || 0}</span>
-                                                    <span className="label">Commits</span>
-                                                </div>
-                                                <div className="mini-stat">
-                                                    <span className="value">{repo.analytics?.consistency?.active_days || 0}</span>
-                                                    <span className="label">Active Days</span>
-                                                </div>
-                                                {repo.analytics?.consistency?.isCramming && (
-                                                    <span className="cramming-badge">Cramming</span>
-                                                )}
-                                            </div>
-                                            <div className="repo-actions">
-                                                <button 
-                                                    className="btn-detail"
-                                                    onClick={() => {
-                                                        setShowAISummary(repo.id);
-                                                        setSelectedRepoData(repo);
-                                                    }}
-                                                >
-                                                    View Insights
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <p className="no-repos">No repositories added yet</p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
                     )}
                 </div>
             )}
@@ -1508,11 +1513,11 @@ export default function Analytics() {
                 <div className="analytics-section">
                     <h2>At-Risk Students</h2>
                     <p className="section-subtitle">Students who may need additional support or attention</p>
-                    
+
                     {atRiskStudents.length === 0 ? (
                         <div className="no-risk-card">
                             <svg viewBox="0 0 24 24" width="48" height="48" fill="#22c55e">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                             </svg>
                             <h3>All Students On Track</h3>
                             <p>No students currently flagged as at-risk. Great job!</p>
@@ -1548,9 +1553,9 @@ export default function Analytics() {
                                             <div key={j} className={`issue-item severity-${issue.severity}`}>
                                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                                     {issue.severity === 'high' ? (
-                                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
                                                     ) : (
-                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                                                     )}
                                                 </svg>
                                                 <span>{issue.message}</span>
@@ -1587,7 +1592,7 @@ export default function Analytics() {
                                 {student.repositories?.map(repo => (
                                     <div key={repo.id} className="repo-progress">
                                         <span className="repo-name">{repo.repo_name}</span>
-                                        <MilestoneRaceTrack 
+                                        <MilestoneRaceTrack
                                             progress={repo.analytics?.milestones}
                                             milestones={milestones}
                                         />
@@ -1607,7 +1612,7 @@ export default function Analytics() {
                             <h2>Repository Analytics</h2>
                             <button className="close-btn" onClick={() => setSelectedRepo(null)}>
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                                 </svg>
                             </button>
                         </div>
@@ -1616,8 +1621,8 @@ export default function Analytics() {
                                 {/* Quality Section */}
                                 <div className="modal-card">
                                     <h3>Code Quality Health</h3>
-                                    <GradeBadge 
-                                        grade={repoAnalytics.quality?.grade} 
+                                    <GradeBadge
+                                        grade={repoAnalytics.quality?.grade}
                                         label="Professionalism"
                                     />
                                     <div className="quality-breakdown">
@@ -1671,7 +1676,7 @@ export default function Analytics() {
                                 {/* Milestone Progress */}
                                 <div className="modal-card full-width">
                                     <h3>Milestone Progress</h3>
-                                    <MilestoneRaceTrack 
+                                    <MilestoneRaceTrack
                                         progress={repoAnalytics.progress}
                                         milestones={milestones}
                                     />
@@ -1684,13 +1689,13 @@ export default function Analytics() {
 
             {/* Repository Details Modal */}
             {showAISummary && (
-                <RepoDetailsModal 
-                    repoId={showAISummary} 
+                <RepoDetailsModal
+                    repoId={showAISummary}
                     repoData={selectedRepoData}
                     onClose={() => {
                         setShowAISummary(null);
                         setSelectedRepoData(null);
-                    }} 
+                    }}
                 />
             )}
         </div>

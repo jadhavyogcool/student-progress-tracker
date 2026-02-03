@@ -7,6 +7,11 @@ import Analytics from "./components/Analytics";
 
 export default function Dashboard({ isAuthenticated, onLogout }) {
     const getApiUrl = () => {
+        // If running on Vercel (production), use the production backend
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+            return 'https://student-progress-tracker-phi.vercel.app';
+        }
+        // Otherwise use env var or localhost
         const url = import.meta.env.VITE_API_URL;
         if (!url) return "http://localhost:3000";
         if (url.startsWith("http")) return url;
