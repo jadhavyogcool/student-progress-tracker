@@ -1126,7 +1126,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                 <div className="sidebar-header">
                     <div className="logo">
                         <div className="logo-icon">S</div>
-                        <span className="logo-text">Scholar</span>
+                        <span className="logo-text">Student Progress</span>
                     </div>
                 </div>
 
