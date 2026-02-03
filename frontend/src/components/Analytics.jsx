@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:3000/api';
+const getApiUrl = () => {
+    const url = import.meta.env.VITE_API_URL;
+    if (!url) return "http://localhost:3000";
+    if (url.startsWith("http")) return url;
+    return `https://${url}`;
+};
+
+const API_URL = `${getApiUrl()}/api`;
 
 /* Heatmap Component */
 function CommitHeatmap({ data }) {
