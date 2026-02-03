@@ -38,13 +38,22 @@ router.post("/auth/login", (req, res) => {
     const { password } = req.body;
     const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
 
+    console.log("Login attempt - Password provided:", !!password);
+    console.log("Login attempt - Session before:", req.session);
+    console.log("Login attempt - Environment:", process.env.NODE_ENV);
+
     if (password === adminPassword) {
         req.session.isAuthenticated = true;
         req.session.save((err) => {
-            if (err) return res.status(500).json({ error: "Session error" });
+            if (err) {
+                console.error("Session save error:", err);
+                return res.status(500).json({ error: "Session error" });
+            }
+            console.log("Login successful - Session after:", req.session);
             res.json({ success: true, message: "Logged in successfully" });
         });
     } else {
+        console.log("Invalid password attempt");
         res.status(401).json({ error: "Invalid password" });
     }
 });
@@ -57,6 +66,8 @@ router.post("/auth/logout", (req, res) => {
 });
 
 router.get("/auth/verify", (req, res) => {
+    console.log("Auth verify - Session:", req.session);
+    console.log("Auth verify - Authenticated:", req.session?.isAuthenticated);
     res.json({ authenticated: req.session && req.session.isAuthenticated });
 });
 
@@ -94,10 +105,14 @@ router.post("/student", requireAuth, async (req, res) => {
 
 router.delete("/student/:id", requireAuth, async (req, res) => {
     try {
+        // Debug log for session (remove in production)
+        console.log("Session in delete:", req.session);
+        
         const { error } = await supabase.from("students").delete().eq("id", req.params.id);
         if (error) throw error;
         res.json({ success: true });
     } catch (error) {
+        console.error("Delete error:", error);
         res.status(500).json({ error: error.message });
     }
 });
