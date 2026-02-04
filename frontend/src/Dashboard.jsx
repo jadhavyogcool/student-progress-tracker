@@ -238,6 +238,26 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
 
     const renderOverview = () => (
         <>
+            {typeof window !== 'undefined' && window.location.hostname !== 'localhost' && API_BASE.includes('localhost') && (
+                <div style={{
+                    backgroundColor: '#fee2e2',
+                    border: '1px solid #ef4444',
+                    color: '#b91c1c',
+                    padding: '1rem',
+                    marginBottom: '2rem',
+                    borderRadius: '0.5rem',
+                    textAlign: 'center'
+                }}>
+                    <strong>⚠️ CONFIGURATION ERROR ⚠️</strong>
+                    <p style={{ margin: '0.5rem 0' }}>
+                        The Frontend cannot connect to the Backend because the <code>VITE_API_URL</code> Environment Variable is missing.
+                    </p>
+                    <p style={{ fontSize: '0.9rem' }}>
+                        Please go to your Netlify/Vercel settings and set <code>VITE_API_URL</code> to your backend URL (e.g., <code>https://student-tracker-backend-hk8i15p4f.vercel.app</code>).
+                        Then <strong>Redeploy</strong> the site.
+                    </p>
+                </div>
+            )}
             <div className="stats-grid">
                 <StatsCard
                     title="Total Students"
