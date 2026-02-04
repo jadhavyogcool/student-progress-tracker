@@ -13,12 +13,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
             return envUrl.startsWith("http") ? envUrl : `https://${envUrl}`;
         }
 
-        // Fallback for production if Env Var is missing
-        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-            return 'https://student-tracker-backend-hk8i15p4f.vercel.app';
-        }
-
-        // Default to localhost
+        // Default to localhost for development
         return "http://localhost:3000";
     };
     const API_BASE = getApiUrl();
