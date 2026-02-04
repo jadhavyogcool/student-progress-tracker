@@ -15,7 +15,7 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
 
         // Fallback for production if Env Var is missing
         if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-            return 'https://student-tracker-backend-pi.vercel.app';
+            return 'https://student-tracker-backend-hk8i15p4f.vercel.app';
         }
 
         // Default to localhost
