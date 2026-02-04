@@ -403,6 +403,9 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                         </div>
                     </div>
                 </div>
+                <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '0.8rem', color: '#ccc' }}>
+                    API Connected to: {API_BASE.replace('https://', '')}
+                </div>
             </div>
         </>
     );

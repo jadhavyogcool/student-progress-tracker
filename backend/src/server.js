@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = new Set([
     "http://localhost:5173",
     "https://student-progress-tracker-f5ql.vercel.app",
+    "https://student-tracker-frontend-three.vercel.app",
     process.env.FRONTEND_URL
 ].filter(Boolean));
 
