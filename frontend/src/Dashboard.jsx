@@ -7,6 +7,11 @@ import Analytics from "./components/Analytics";
 
 export default function Dashboard({ isAuthenticated, onLogout }) {
     const getApiUrl = () => {
+        // If running on Vercel (production), use the production backend
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+            return 'https://student-tracker-backend-woad.vercel.app';
+        }
+
         // First check environment variable (set in Vercel or .env)
         const envUrl = import.meta.env.VITE_API_URL;
         if (envUrl) {

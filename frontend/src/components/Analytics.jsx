@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const getApiUrl = () => {
     // If running on Vercel (production), use the production backend
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        return 'https://student-progress-tracker-phi.vercel.app';
+        return 'https://student-tracker-backend-woad.vercel.app';
     }
     // Otherwise use env var or localhost
     const url = import.meta.env.VITE_API_URL;
