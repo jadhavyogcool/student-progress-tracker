@@ -152,15 +152,19 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
 
     const handleSyncAll = async () => {
         try {
-            const allRepos = students.flatMap(s => s.repositories || []);
-            await Promise.all(allRepos.map(repo =>
-                fetch(`${API_BASE}/api/sync/${repo.id}`, { method: "POST" })
-            ));
-            fetchData();
+            const res = await fetch(`${API_BASE}/api/sync/all`);
+            if (res.ok) {
+                alert("Global sync triggered successfully. Data will update in a few moments.");
+                fetchData();
+            } else {
+                alert("Sync failed. Please try again.");
+            }
         } catch (err) {
             console.error(err);
         }
     };
+
+
 
     const formatRelativeTime = (dateString) => {
         if (!dateString) return 'Never';
@@ -785,6 +789,15 @@ export default function Dashboard({ isAuthenticated, onLogout }) {
                                 </div>
                             </div>
 
+                            <div className="card" style={{ marginTop: '1rem' }}>
+                                <div className="card-body">
+                                    <h3 style={{ fontSize: '1.1rem', marginBottom: '10px', fontWeight: 600 }}>Data Sync</h3>
+                                    <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '10px' }}>Manually update commit data for all repositories.</p>
+                                    <button onClick={handleSyncAll} className="btn-secondary" style={{ width: '100%' }}>
+                                        Sync All Data Now
+                                    </button>
+                                </div>
+                            </div>
                             <BulkUpload onUploadComplete={fetchData} API_BASE={API_BASE} />
                         </>
                     )}
