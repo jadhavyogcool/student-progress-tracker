@@ -7,15 +7,19 @@ import Analytics from "./components/Analytics";
 
 export default function Dashboard({ isAuthenticated, onLogout }) {
     const getApiUrl = () => {
-        // If running on Vercel (production), use the production backend
-        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-            return 'https://student-progress-tracker-phi.vercel.app';
+        // First check environment variable (set in Vercel or .env)
+        const envUrl = import.meta.env.VITE_API_URL;
+        if (envUrl) {
+            return envUrl.startsWith("http") ? envUrl : `https://${envUrl}`;
         }
-        // Otherwise use env var or localhost
-        const url = import.meta.env.VITE_API_URL;
-        if (!url) return "http://localhost:3000";
-        if (url.startsWith("http")) return url;
-        return `https://${url}`;
+
+        // Fallback for production if Env Var is missing
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+            return 'https://student-tracker-backend-pi.vercel.app';
+        }
+
+        // Default to localhost
+        return "http://localhost:3000";
     };
     const API_BASE = getApiUrl();
     const navigate = useNavigate();
