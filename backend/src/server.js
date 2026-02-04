@@ -66,8 +66,15 @@ app.get("/", (req, res) => {
     res.send("Student Progress Tracker API is running");
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Backend running on port ${PORT}`);
-    // Sync logic updated for Vercel Cron compatibility
-    initScheduler();
-});
+// Only run the server if not in Vercel environment (Vercel handles the server via export)
+// On Vercel, process.env.VERCEL is usually set, or NODE_ENV=production.
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Backend running on port ${PORT}`);
+        // Sync logic updated for Vercel Cron compatibility
+        initScheduler();
+    });
+}
+
+// Export for Vercel
+export default app;
