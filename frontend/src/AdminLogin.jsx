@@ -75,7 +75,7 @@ export default function AdminLogin({ onLogin }) {
                             {loading ? "Authenticating..." : "Sign In"}
                         </button>
                         <div className="login-footer">
-                            <p>Default password: StudentTracker2026!</p>
+
                         </div>
                     </form>
                 </div>
