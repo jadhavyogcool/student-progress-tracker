@@ -66,7 +66,12 @@ app.use(session({
 app.use("/api", routes);
 
 app.get("/", (req, res) => {
-    res.send("Student Progress Tracker API is running");
+    res.json({
+        message: "Student Progress Tracker API is running",
+        version: "v1.0.1",
+        deployTime: "2026-03-07T12:12:00Z",
+        branch: "main"
+    });
 });
 
 app.listen(PORT, "0.0.0.0", () => {
