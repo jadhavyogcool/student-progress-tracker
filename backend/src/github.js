@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export async function fetchCommits(owner, repo, maxCommits = 1000) {
+export async function fetchCommits(owner, repo, maxCommits = 10000) {
     let allCommits = [];
     let page = 1;
     const perPage = 100;

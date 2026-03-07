@@ -14,11 +14,27 @@ const upload = multer({ storage: multer.memoryStorage() });
 /* ========== HELPER FUNCTIONS (Optimized Data Fetching) ========== */
 
 // Fetch all data in parallel to avoid N+1 query performance issues
+async function fetchAllRecords(table, selectQuery) {
+    let allData = [];
+    let from = 0;
+    const step = 1000;
+    while (true) {
+        const { data, error } = await supabase.from(table).select(selectQuery).range(from, from + step - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < step) break;
+        from += step;
+    }
+    return allData;
+}
+
+// Fetch all data in parallel to avoid N+1 query performance issues
 async function getGlobalData() {
     const [studentsRes, reposRes, commitsRes] = await Promise.all([
-        supabase.from("students").select("id, name, email, created_at"),
-        supabase.from("repositories").select("id, student_id, repo_name, owner, repo_url"),
-        supabase.from("commits").select("repo_id, commit_date, author, sha")
+        fetchAllRecords("students", "id, name, email, created_at").then(data => ({ data, error: null })).catch(error => ({ data: null, error })),
+        fetchAllRecords("repositories", "id, student_id, repo_name, owner, repo_url").then(data => ({ data, error: null })).catch(error => ({ data: null, error })),
+        fetchAllRecords("commits", "repo_id, commit_date, author, sha").then(data => ({ data, error: null })).catch(error => ({ data: null, error }))
     ]);
 
     if (studentsRes.error) throw studentsRes.error;
